@@ -1,0 +1,82 @@
+.syntax unified
+.cpu cortex-m0plus
+.thumb
+
+.thumb_func
+.global mainS
+.type mainS, %function
+
+.equ LED0, 0
+.equ LED1, 1
+.equ BUT1, 2
+.equ BUT2, 3
+.equ GPIO_OUT, 1
+.equ GPIO_IN, 0
+
+.equ SIO_BASE,          0xD0000000
+.equ SIO_GPIO_IN,       0x04 
+.equ SIO_GPIO_OUT_SET, 0x14 
+.equ SIO_GPIO_OUT_CLR, 0x18
+
+mainS:
+    push {r4, r5, lr}
+
+    bl stdio_init_all
+
+    movs r0, #LED0
+    bl link_gpio_init
+    movs r0, #LED0
+    movs r1, #GPIO_OUT
+    bl link_gpio_set_dir
+
+    movs r0, #LED1
+    bl link_gpio_init
+    movs r0, #LED1
+    movs r1, #GPIO_OUT
+    bl link_gpio_set_dir
+
+    movs r0, #BUT1
+    bl link_gpio_init
+    movs r0, #BUT1
+    movs r1, #GPIO_IN
+    bl link_gpio_set_dir
+    movs r0, #BUT1
+    bl link_gpio_pull_up
+
+    movs r0, #BUT2
+    bl link_gpio_init
+    movs r0, #BUT2
+    movs r1, #GPIO_IN
+    bl link_gpio_set_dir
+    movs r0, #BUT2
+    bl link_gpio_pull_up
+
+    ldr r4, =SIO_BASE
+
+loop:
+    ldr r5, [r4, #SIO_GPIO_IN]
+    movs r0, #0b00110000
+    ands r5, r0
+
+    cmp r5, #0b00100000
+    beq turn_on
+
+    cmp r5, #0b00010000
+    beq turn_off
+
+    b back_to_loop
+
+turn_on:
+    movs r0, #b0011
+    str r0, [r4, #SIO_GPIO_OUT_SET]
+    b back_to_loop
+
+turn_off:
+    movs r0,#0b0011
+    str r0, [r4, #SIO_GPIO_OUT_CLR]
+
+back_to_loop:
+    movs r0, #55
+    bl sleep_ms
+
+    b loop
