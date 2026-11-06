@@ -1,0 +1,70 @@
+#include "pico/stdlib.h"
+#include "hardware/gpio.h"
+
+#define LED1    0
+#define LED2    1
+#define LED3    2
+#define LED4   3
+
+#define B_INC 4
+#define B_DEC 5
+
+volatile int counter=0;
+
+void update_leds(int val) {
+    int bit1=(val >> 0) & 1;
+    int bit2=(val >> 1) & 1;
+    int bit3=(val >> 2) & 1;
+    int bit4=(val >> 3) & 1;
+
+    gpio_put(LED1, bit1);
+    gpio_put(LED2,bit2);
+    gpio_put(LED3, bit3);
+    gpio_put(LED4, bit4);
+}
+void gpio_callback(uint gpio, uint32_t events) {
+
+
+static uint32_t last_time = 0;
+    uint32_t current_time = to_ms_since_boot(get_absolute_time());  
+    if (current_time - last_time < 150) {
+        return; // Ignorar rebotes mecánicos dentro de los 150 ms
+    }
+    last_time = current_time;
+
+    if(gpio==B_INC){
+        if(counter<16){
+            counter++;
+        }
+        
+    }else if(gpio==B_DEC){
+        if(counter>0){
+            counter--;
+        }
+    }
+    update_leds(counter);
+}
+
+int main() {
+    stdio_init_all();
+    for(int i = LED1; i <= LED4; i++){
+        gpio_init(i);
+        gpio_set_dir(i,GPIO_OUT);
+    }
+
+    gpio_init(B_INC);
+    gpio_set_dir(B_INC,GPIO_IN);
+    gpio_pull_up(B_INC);
+
+    gpio_init(B_DEC);
+    gpio_set_dir(B_DEC,GPIO_IN);
+    gpio_pull_up(B_DEC);
+    update_leds(counter);
+
+    gpio_set_irq_enabled_with_callback(B_INC, GPIO_IRQ_EDGE_FALL, true, &gpio_callback);  
+    gpio_set_irq_enabled_with_callback(B_DEC, GPIO_IRQ_EDGE_FALL, true, &gpio_callback);
+
+    while (1) {
+        tight_loop_contents();
+    }
+}    
