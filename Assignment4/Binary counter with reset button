@@ -1,0 +1,55 @@
+#include "pico/stdlib.h"
+#include "hardware/gpio.h"
+
+#define LED1    0
+#define LED2    1
+#define LED3    2
+#define LED4   3
+
+#define B_INC 4
+
+volatile int counter=0;
+
+void update_leds(int val) {
+    int bit1=(val >> 0) & 1;
+    int bit2=(val >> 1) & 1;
+    int bit3=(val >> 2) & 1;
+    int bit4=(val >> 3) & 1;
+
+    gpio_put(LED1, bit1);
+    gpio_put(LED2,bit2);
+    gpio_put(LED3, bit3);
+    gpio_put(LED4, bit4);
+}
+void gpio_callback(uint gpio, uint32_t events) {
+
+    counter=0;
+    update_leds(counter);
+}
+int64_t timer_callback(alarm_id_t id,void *unused){
+    counter++;
+    if(counter>15){
+        counter=15;
+    }
+    update_leds(counter);
+    return 1000000;
+}
+int main() {
+    stdio_init_all();
+   for(int i = LED1; i <= LED4; i++){
+        gpio_init(i);
+        gpio_set_dir(i,GPIO_OUT);
+    }
+    gpio_init(B_INC);
+    gpio_set_dir(B_INC,GPIO_IN);
+    gpio_pull_up(B_INC);  
+
+    update_leds(counter);
+
+    gpio_set_irq_enabled_with_callback(B_INC, GPIO_IRQ_EDGE_RISE, true, &gpio_callback);  
+    add_alarm_in_ms(1000, timer_callback, NULL, false); 
+
+    while (1) {
+        tight_loop_contents();
+    }
+}    
