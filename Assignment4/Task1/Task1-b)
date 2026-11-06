@@ -1,0 +1,42 @@
+#include "pico/stdlib.h"
+
+#define LED   0
+#define B_ON  4
+#define B_OFF 5
+
+#define SIO_BASE          0xD0000000u
+#define SIO_GPIO_IN       ((volatile uint32_t *)(SIO_BASE + 0x04))
+#define SIO_GPIO_OUT_SET  ((volatile uint32_t *)(SIO_BASE + 0x14))
+#define SIO_GPIO_OUT_CLR  ((volatile uint32_t *)(SIO_BASE + 0x18))
+
+
+
+int main() {
+    stdio_init_all();
+
+    gpio_init(LED);
+    gpio_set_dir(LED, GPIO_OUT);
+
+    gpio_init(B_ON);
+    gpio_set_dir(B_ON, GPIO_IN);
+    gpio_pull_up(B_ON);
+
+    gpio_init(B_OFF);
+    gpio_set_dir(B_OFF, GPIO_IN);
+    gpio_pull_up(B_OFF);
+
+    while (true) {
+        uint32_t inputs = *SIO_GPIO_IN;
+
+        if (!(inputs & 0b00010000) && (inputs & 0b00100000)) {
+            *SIO_GPIO_OUT_SET = 0b000001
+        } 
+        else if (!(inputs & 0b00100000) && (inputs & 0b00010000)) {
+            *SIO_GPIO_OUT_CLR = 0b000001
+        }
+
+        sleep_ms(50);
+    }
+
+    return 0;
+}
