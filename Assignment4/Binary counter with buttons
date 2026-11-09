@@ -33,7 +33,7 @@ static uint32_t last_time = 0;
     last_time = current_time;
 
     if(gpio==B_INC){
-        if(counter<16){
+        if(counter<15){
             counter++;
         }
         
