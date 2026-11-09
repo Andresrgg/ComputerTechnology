@@ -1,13 +1,13 @@
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 
-#define LED1    0
-#define LED2    1
-#define LED3    2
-#define LED4   3
+#define LED1    1
+#define LED2    2
+#define LED3    3
+#define LED4   4
 
-#define B_INC 4
-#define B_DEC 5
+#define B_INC 5
+#define B_DEC 6
 
 volatile int counter=0;
 
