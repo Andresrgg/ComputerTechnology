@@ -1,8 +1,9 @@
 #include "pico/stdlib.h"
 
 #define LED1   0
-#define B_ON   4
-#define B_OFF  5
+#define B_ON   1
+#define B_OFF  2
+
 #define LED6   6
 
 #define SIO_BASE          0xD0000000u
@@ -31,11 +32,11 @@ int main() {
     while (true) {
         uint32_t inputs = *SIO_GPIO_IN;
 
-        if (!(inputs & 0b00010000) && (inputs & 0b00100000)) {
-            *SIO_GPIO_OUT_SET = 0b00000011;
+        if (!(inputs & 0b00000010) && (inputs & 0b00000100)) {
+            *SIO_GPIO_OUT_SET = 0b01000001;
         } 
-        else if (!(inputs & 0b00100000) && (inputs & 0b00010000)) {
-            *SIO_GPIO_OUT_CLR = 0b00000011;
+        else if (!(inputs & 0b00000100) && (inputs & 0b00000010)) {
+            *SIO_GPIO_OUT_CLR = 0b01000001;
         }
 
         sleep_ms(50);
