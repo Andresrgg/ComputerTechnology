@@ -1,8 +1,8 @@
 #include "pico/stdlib.h"
 
 #define LED   0
-#define B_ON  4
-#define B_OFF 5
+#define B_ON  1
+#define B_OFF 2
 
 int main() {
     stdio_init_all();
