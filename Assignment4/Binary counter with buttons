@@ -23,15 +23,6 @@ void update_leds(int val) {
     gpio_put(LED4, bit4);
 }
 void gpio_callback(uint gpio, uint32_t events) {
-
-
-static uint32_t last_time = 0;
-    uint32_t current_time = to_ms_since_boot(get_absolute_time());  
-    if (current_time - last_time < 150) {
-        return; // Ignorar rebotes mecánicos dentro de los 150 ms
-    }
-    last_time = current_time;
-
     if(gpio==B_INC){
         if(counter<15){
             counter++;
