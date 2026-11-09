@@ -27,9 +27,6 @@ void gpio_callback(uint gpio, uint32_t events) {
         update_leds(counter);
     }
 }
-
-    update_leds(counter);
-}
 int64_t timer_callback(alarm_id_t id,void *unused){
     counter++;
     if(counter>15){
