@@ -22,8 +22,12 @@ void update_leds(int val) {
     gpio_put(LED4, bit4);
 }
 void gpio_callback(uint gpio, uint32_t events) {
+    if (gpio == B_INC ) {
+        counter = 0;
+        update_leds(counter);
+    }
+}
 
-    counter=0;
     update_leds(counter);
 }
 int64_t timer_callback(alarm_id_t id,void *unused){
