@@ -50,7 +50,7 @@ int main() {
 
     update_leds(counter);
 
-    gpio_set_irq_enabled_with_callback(B_INC, GPIO_IRQ_EDGE_RISE, true, &gpio_callback);  
+    gpio_set_irq_enabled_with_callback(B_INC, GPIO_IRQ_EDGE_FALL, true, &gpio_callback);  
     add_alarm_in_ms(1000, timer_callback, NULL, false); 
 
     while (1) {
